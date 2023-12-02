@@ -52,7 +52,7 @@ include("./common/header.php");
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" id="albumForm">
         <div class="row form-group">
             <div class="col-md-7">
-                <select class="form-control" name="albumId" onchange="getPicturesByAlbumId(this.value)">
+                <select class="form-control" name="albumId" onchange="AlbumSelected()">
                     <?php
                     $albums = getAlbums($user->getUserId());
                     $selectedAlbumId = isset($_SESSION['albumId']) ? $_SESSION['albumId'] : -1;

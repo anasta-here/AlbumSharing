@@ -1,4 +1,4 @@
-function getPicturesByAlbumId(albumId) {
+function AlbumSelected() {
     document.getElementById('albumSelectionChange').click();
 }
 

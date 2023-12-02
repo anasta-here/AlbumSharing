@@ -225,7 +225,7 @@ function getPictureNumByAlbumId($ablumId) {
 
 function deleteAlbum($albumId) {
     $pdo = getPDO();
-    $sql = "DELETE FROM Album WHERE Album_Id = :albumId;";
+    $sql = "DELETE FROM Picture WHERE Album_Id = :albumId; DELETE FROM Album WHERE Album_Id = :albumId;";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['albumId' => $albumId]);
 }
