@@ -1,8 +1,9 @@
 <?php
 include_once 'EntityClassLib.php';
-include_once('Functions.php');
+include_once 'Functions.php';
 session_start();
-//check whether the user is logged in
+
+// Check whether the user is logged in
 if (isset($_SESSION["user"])) {
     $user = $_SESSION["user"];
 } else {
@@ -10,11 +11,21 @@ if (isset($_SESSION["user"])) {
     exit();
 }
 
+unset($_SESSION['fileName']);
+unset($_SESSION["selectedPicture"]);
+unset($_SESSION["comments"]);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
+
     if (isset($_POST["albumChangeBtn"])) {
         if ($albumId != -1) {
+            $pictures = getAllPicturessByAlbumId($albumId);
+            if (empty($pictures)) {
+                $noPictures = true;
+            } else {
+                $noPictures = false;
+            }
             $_SESSION["albumId"] = $albumId;
         } else {
             $_SESSION["albumId"] = '';
@@ -23,6 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         unset($_SESSION["selectedPicture"]);
         unset($_SESSION["comments"]);
     }
+
     if (isset($_POST['thumbnailChangeBtn'])) {
         $fileName = $_POST['selectedImageFileName'];
         $_SESSION['fileName'] = $fileName;
@@ -35,13 +47,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (isset($_POST['commentBtn'])) {
-        $selectedPicture = $_SESSION["selectedPicture"];
-        addCommentOnMyPicturePage($user->getUserId(), $selectedPicture->getPictureId(), $_POST['commentText']);
-        $comments = getAllCommentsForSelectedPictureOnMyPicturePage($selectedPicture->getPictureId());
-        $_SESSION['comments'] = $comments;
+        if (isset($_SESSION["selectedPicture"])) {
+            $selectedPicture = $_SESSION["selectedPicture"];
+            addCommentOnMyPicturePage($user->getUserId(), $selectedPicture->getPictureId(), $_POST['commentText']);
+            $comments = getAllCommentsForSelectedPictureOnMyPicturePage($selectedPicture->getPictureId());
+            $_SESSION['comments'] = $comments;
+        } else {
+            if (isset($_SESSION['albumId'])) {
+                $pictures = getAllPicturessByAlbumId($_SESSION["albumId"]);
+                addCommentOnMyPicturePage($user->getUserId(), $pictures[0]->getPictureId(), $_POST['commentText']);
+            }
+        }
     }
 }
-
 
 include("./common/header.php");
 ?>
@@ -68,13 +86,26 @@ include("./common/header.php");
         <div class="row form-group">
             <div class="col-md-7">
                 <?php
-                //global $fileName;
-
                 if (isset($_SESSION['fileName']) && isset($_SESSION["selectedPicture"])) {
-                    $selectedPircture = $_SESSION["selectedPicture"];
-                    $selectedPirctureTitle = $selectedPircture->getTitle();
-                    echo "<h4 class=\"text-center\">$selectedPirctureTitle</h4>";
+                    $selectedPicture = $_SESSION["selectedPicture"];
+                    $selectedPictureTitle = $selectedPicture->getTitle();
+                    echo "<h4 class=\"text-center\">$selectedPictureTitle</h4>";
                     echo '<img class="img-responsive" src="./images/' . $_SESSION['fileName'] . '">';
+                } else {
+                    if (isset($_SESSION["albumId"])) {
+                        $pictures = getAllPicturessByAlbumId($_SESSION["albumId"]);
+                        // Check if the array is not empty before accessing its elements
+                        if (!empty($pictures)) {
+                            $firstPictureTitle = $pictures[0]->getTitle();
+                            $originalPath = $pictures[0]->getFileName();
+                            $imagesPath = preg_replace('/^\.\/originals\//', './images/', $originalPath);
+
+                            echo "<h4 class=\"text-center\">$firstPictureTitle</h4>";
+                            echo '<img class="img-responsive" src="' . $imagesPath . '">';
+                        } else {
+                            echo "<p>No pictures found in the album.</p>";
+                        }
+                    }
                 }
                 ?>
                 <br>
@@ -83,53 +114,80 @@ include("./common/header.php");
                         <?php
                         if (isset($_SESSION["albumId"])) {
                             $pictures = getAllPicturessByAlbumId($_SESSION["albumId"]);
-                            if (isset($_SESSION["selectedPicture"])){
-                                $selectedPircture = $_SESSION["selectedPicture"];
-                                $selectedPirctureFileName = $selectedPircture->getFileName();                           
+                            if (isset($_SESSION["selectedPicture"])) {
+                                $selectedPicture = $_SESSION["selectedPicture"];
+                                $selectedPictureFileName = $selectedPicture->getFileName();
                             }
+
                             foreach ($pictures as $index => $picture) {
+                                global $selectedPictureFileName;
                                 $originalPath = $picture->getFileName();
                                 $thumbnailsPath = preg_replace('/^\.\/originals\//', './thumbnails/', $originalPath);
-                                // Check if the current picture is the selected one
-                                $thumbnailClass = ($originalPath == $selectedPirctureFileName) ? 'thumbnail clicked' : 'thumbnail';                            
+                                $thumbnailClass = ($originalPath == $selectedPictureFileName) ? 'thumbnail clicked' : 'thumbnail';
                                 echo "<div class='$thumbnailClass' data-index='$index' data-path='$thumbnailsPath' onclick='highlightThumbnail(this)'>"
                                 . "<img src='$thumbnailsPath'>"
                                 . "</div>";
                             }
                         }
-                        ?>            
+                        ?>
                     </div>
                 </div>
                 <input type="text" name="selectedImageFileName" id="imageFileName" hidden/>
             </div>
 
-            <div class="col-md-5">   
-                <?php
-                if (isset($_SESSION["selectedPicture"])) {
-                    $selectedPicture = $_SESSION["selectedPicture"];
-                    $selectedPirctureDescription = $selectedPicture->getDescription();
-                    if(!empty($selectedPirctureDescription)){
-                        echo '<label class="col-form-label">Description:</label>';
-                        echo "<p>$selectedPirctureDescription</p>";
-                    }
-                    echo '<label class="col-form-label"> Comments:</label>';
-                    if (isset($_SESSION['comments']) && is_array($_SESSION['comments'])) {
-                        $comments = $_SESSION['comments'];
-
-                        for ($i = count($comments) - 1; $i >= 0; $i--) {
-                            echo '<p>';
-                            echo '<span class="text-primary">' . $comments[$i]->getUserName() . '</span>' . ': ';
-                            echo $comments[$i]->getCommentText();
-                            echo '</p>';
+            <?php global $noPictures;
+            if (!$noPictures) : ?>
+                <div class="col-md-5">
+                    <?php
+                    if (isset($_SESSION["selectedPicture"])) {
+                        $selectedPicture = $_SESSION["selectedPicture"];
+                        $selectedPictureDescription = $selectedPicture->getDescription();
+                        if (!empty($selectedPictureDescription)) {
+                            echo '<label class="col-form-label">Description:</label>';
+                            echo "<p>$selectedPictureDescription</p>";
                         }
-                    }    
-                    echo '<textarea name="commentText" class="form-control" placeholder="Leave a comment..."></textarea><br>';
-                    echo '<button type="submit" name="commentBtn" class="btn btn-primary">Add comment</button>';
-                }
-                ?>
-                <button type="submit" name="albumChangeBtn" id="albumSelectionChange" hidden></button>
-                <button type="submit" name="thumbnailChangeBtn" id="thumbnailChange" hidden></button>     
-            </div>
+                        echo '<label class="col-form-label"> Comments:</label>';
+                        if (isset($_SESSION['comments']) && is_array($_SESSION['comments'])) {
+                            $comments = $_SESSION['comments'];
+
+                            for ($i = count($comments) - 1; $i >= 0; $i--) {
+                                echo '<p>';
+                                echo '<span class="text-primary">' . $comments[$i]->getUserName() . '</span>' . ': ';
+                                echo $comments[$i]->getCommentText();
+                                echo '</p>';
+                            }
+                        }
+                        echo '<textarea name="commentText" class="form-control" placeholder="Leave a comment..."></textarea><br>';
+                        echo '<button type="submit" name="commentBtn" class="btn btn-primary">Add comment</button>';
+                    } else {
+                        if (isset($_SESSION['albumId'])) {
+                            $pictures = getAllPicturessByAlbumId($_SESSION["albumId"]);
+                            // Check if the array is not empty before accessing its elements
+                            if (!empty($pictures)) {
+                                $firstPictureDescription = $pictures[0]->getDescription();
+                                $comments = getAllCommentsForSelectedPictureOnMyPicturePage($pictures[0]->getPictureId());
+                                if (!empty($firstPictureDescription)) {
+                                    echo '<label class="col-form-label">Description:</label>';
+                                    echo "<p>$firstPictureDescription</p>";
+                                }
+                                echo '<label class="col-form-label"> Comments:</label>';
+                                for ($i = count($comments) - 1; $i >= 0; $i--) {
+                                    echo '<p>';
+                                    echo '<span class="text-primary">' . $comments[$i]->getUserName() . '</span>' . ': ';
+                                    echo $comments[$i]->getCommentText();
+                                    echo '</p>';
+                                }
+                                echo '<textarea name="commentText" class="form-control" placeholder="Leave a comment..."></textarea><br>';
+                                echo '<button type="submit" name="commentBtn" class="btn btn-primary">Add comment</button>';
+                            }
+                        }
+                    }
+                    ?>
+                    <?php endif; ?>
+                    <button type="submit" name="albumChangeBtn" id="albumSelectionChange" hidden></button>
+                    <button type="submit" name="thumbnailChangeBtn" id="thumbnailChange" hidden></button>
+                </div>
+            
         </div>
     </form>
 </div>
