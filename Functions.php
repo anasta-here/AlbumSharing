@@ -224,17 +224,24 @@ function getPictureNumByAlbumId($ablumId) {
 }
 
 function deleteAlbum($albumId) {
+    $pictures = getAllPicturessByAlbumId($albumId);
     $pdo = getPDO();
-    $sql = "DELETE FROM Picture WHERE Album_Id = :albumId; DELETE FROM Album WHERE Album_Id = :albumId;";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['albumId' => $albumId]);
-}
-
-function addPicture($albumId, $fileName, $title, $description) {
-    $pdo = getPDO();
-    $sql = "INSERT INTO Picture (Album_Id, File_Name, Title, Description) VALUES( :Album_Id, :File_Name, :Title, :Description)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute(['Album_Id' => $albumId, 'File_Name' => $fileName, 'Title' => $title, 'Description' => $description]);
+    
+    foreach($pictures as $picture){
+        $pictureId = $picture->getPictureId();
+        
+        $sql1 = "DELETE FROM Comment WHERE Picture_Id = :pictureId";
+        $stmt1 = $pdo->prepare($sql1);
+        $stmt1->execute(['pictureId' => $pictureId]);
+        
+        $sql2 = "DELETE FROM Picture WHERE Picture_Id = :pictureId";
+        $stmt2 = $pdo->prepare($sql2);
+        $stmt2->execute(['pictureId' => $pictureId]);        
+    }
+    
+    $sql3 = "DELETE FROM Album WHERE Album_Id = :albumId;";
+    $stmt3 = $pdo->prepare($sql3);
+    $stmt3->execute(['albumId' => $albumId]);
 }
 
 function getAllPicturessByAlbumId($ablumId) {
