@@ -1,20 +1,20 @@
 <?php
+
 class User {
+
     private $userId;
     private $name;
     private $phone;
-    
     private $messages;
-    
-    public function __construct($userId, $name, $phone)
-    {
+
+    public function __construct($userId, $name, $phone) {
         $this->userId = $userId;
         $this->name = $name;
         $this->phone = $phone;
-        
+
         $this->messages = array();
     }
-    
+
     public function getUserId() {
         return $this->userId;
     }
@@ -29,50 +29,125 @@ class User {
 }
 
 class Accessibility {
+
     private $code;
     private $description;
-    public function __construct($code, $description)
-    {
+
+    public function __construct($code, $description) {
         $this->code = $code;
         $this->description = $description;
     }
-    
-    public function getCode(){
+
+    public function getCode() {
         return $this->code;
     }
-    public function getDescription(){
+
+    public function getDescription() {
         return $this->description;
     }
 }
 
 class Album {
+
     private $albumId;
     private $title;
     private $description;
     private $userId;
     private $accessibilityCode;
-    public function __construct($albumId, $title, $description, $userId, $accessibilityCode)
-    {
+
+    public function __construct($albumId, $title, $description, $userId, $accessibilityCode) {
         $this->albumId = $albumId;
         $this->title = $title;
         $this->description = $description;
         $this->userId = $userId;
         $this->accessibilityCode = $accessibilityCode;
     }
-    
-    public function getAlbumId(){
+
+    public function getAlbumId() {
         return $this->albumId;
     }
-    public function getTitle(){
+
+    public function getTitle() {
         return $this->title;
-    }    
-    public function getDescription(){
+    }
+
+    public function getDescription() {
         return $this->description;
     }
-    public function getUserId(){
+
+    public function getUserId() {
         return $this->userId;
     }
-    public function getAccessibilityCode(){
+
+    public function getAccessibilityCode() {
         return $this->accessibilityCode;
-    }    
+    }
+}
+
+class Picture {
+
+    private $pictureId;
+    private $albumId;
+    private $fileName;
+    private $title;
+    private $description;
+
+    public function __construct($pictureId, $albumId, $fileName, $title, $description) {
+        $this->pictureId = $pictureId;
+        $this->albumId = $albumId;
+        $this->fileName = $fileName;
+        $this->title = $title;
+        $this->description = $description;
+    }
+
+    public function getPictureId() {
+        return $this->pictureId;
+    }
+
+    public function getAlbumId() {
+        return $this->albumId;
+    }
+
+    public function getFileName() {
+        return $this->fileName;
+    }
+
+    public function getTitle() {
+        return $this->title;
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+}
+
+class Comment {
+
+    private $commentId;
+    private $commentText;
+    private $userId;
+    private $name;
+
+    public function __construct($commentId, $commentText, $userId, $name) {
+        $this->commentId = $commentId;
+        $this->commentText = $commentText;
+        $this->userId = $userId;
+        $this->name = $name;
+    }
+
+    public function getCommentId() {
+        return $this->commentId;
+    }
+
+    public function getCommentText() {
+        return $this->commentText;
+    }
+
+    public function getUserId() {
+        return $this->userId;
+    }
+
+    public function getUserName() {
+        return $this->name;
+    }
 }

@@ -9,8 +9,6 @@
         header("Location: Login.php");
         exit();           
     }
-      
-
     
     include("./common/header.php");  
 ?>

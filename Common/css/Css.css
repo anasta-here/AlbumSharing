@@ -1,0 +1,21 @@
+.thumbnail-bar {
+    overflow-x: scroll;
+    white-space: nowrap;
+}
+
+.thumbnails-container {
+    display: inline-block;
+    min-width: 100%;
+
+}
+
+.thumbnail {
+    display: inline-block;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.thumbnail.clicked {
+    border: 2px solid blue !important; 
+}
+

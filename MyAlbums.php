@@ -10,6 +10,7 @@
         exit();           
     }
     
+    
     $accessibilities = getAccessibilities();
     $albums = getAlbums($user->getUserId());
     
@@ -56,7 +57,7 @@
                 for ($i = 0; $i < count($albums); $i++) {
                     echo '<tr>';
                     echo '<td><a href="MyPictures.php">'.$albums[$i]->getTitle().'</a></td>';
-                    echo '<td>'.'to be calculated'.'</td>';
+                    echo '<td>'.getPictureNumByAlbumId($albums[$i]->getAlbumId()).'</td>';
                     echo '<td><select class="form-control" name="accessibility[]" onchange="updateAlbum('.$i.','.$albums[$i]->getAlbumId().')">'; //pass index and albumId as two parameters to the function
                     foreach($accessibilities as $a){
                         echo '<option value="'.$a->getCode().'"'.($albums[$i]->getAccessibilityCode() == $a->getCode() ? 'selected': '').'>'.$a->getDescription().'</option>'; //display the preferred accessibility option stored in the database as selected
