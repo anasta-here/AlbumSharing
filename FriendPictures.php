@@ -14,6 +14,7 @@ if (isset($_SESSION["friendId"])) {
 unset($_SESSION['fileName']);
 unset($_SESSION["selectedPicture"]);
 unset($_SESSION["comments"]);
+unset($_SESSION["albumId"]);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);

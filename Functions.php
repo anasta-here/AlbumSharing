@@ -419,6 +419,13 @@ function ValidateFriendId($userId, $friendId) {
     return $friendIdErr;
 }
 
+function insertAcceptedFriendshipRecordForRequester($requesterId, $userId) {
+    $pdo = getPDO();
+    $sql = "INSERT INTO Friendship (Friend_RequesterId, Friend_RequesteeId, Status) VALUES( :userId, :requesterId, 'accepted')";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['requesterId' => $requesterId, 'userId' => $userId]);
+}
+
 function sendFriendRequest($userId, $friendId, $friendName, $status) {
     $pdo = getPDO();
     $sql = "INSERT INTO Friendship (Friend_RequesterId, Friend_RequesteeId, Status) VALUES( :userId, :friendId, :status)";
@@ -487,10 +494,7 @@ function getFriendList($userId) {
     $pdo = getPDO();
     $sql = "SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
         inner join User on Friend_RequesterId = User.UserId
-        WHERE (Friend_RequesteeId = :userId) AND Status = 'accepted' UNION
-		SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
-        inner join User on Friend_RequesteeId = User.UserId
-        WHERE (Friend_RequesterId = :userId) AND Status = 'accepted'";
+        WHERE (Friend_RequesteeId = :userId) AND Status = 'accepted'";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['userId' => $userId]);
     foreach ($stmt as $row) {

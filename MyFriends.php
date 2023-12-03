@@ -25,6 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedRequesterIdList = $_POST['selectedRequesterIdList'];
         foreach ($selectedRequesterIdList as $requesterId) {
             acceptFriendRequest($requesterId, $user->getUserId());
+            insertAcceptedFriendshipRecordForRequester($requesterId, $user->getUserId());
             $friends = getFriendList($user->getUserId());
             $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
         }
@@ -72,20 +73,17 @@ include("./common/header.php");
             </thead>    
             <tbody>
                 <?php
-                //global $friends;
+                global $friends;
                 if (!empty($friends)) {
                     foreach ($friends as $fd) {
-                        //to avoid friend duplication in two-way friend requests
-                        if ($fd->getRequesterId() != $user->getUserId()){
-                            $friendName = $fd->getRequesterName();
-                            $friendId = $fd->getRequesterId();
-                            $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
-                            echo '<tr>';
-                            echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
-                            echo "<td>$albumNum</td>";
-                            echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
-                            echo '</tr>';                            
-                        }
+                        $friendName = $fd->getRequesterName();
+                        $friendId = $fd->getRequesterId();
+                        $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
+                        echo '<tr>';
+                        echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
+                        echo "<td>$albumNum</td>";
+                        echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
+                        echo '</tr>';                            
                     }
                 }
                 ?>
@@ -147,14 +145,18 @@ include("./common/header.php");
         return false;
     }   
     
-    defriendBtn.addEventListener('click', function(){
+    defriendBtn.addEventListener('click', function(e){
         if (confirm("The selected friends will be defriended!") === true) {
             document.getElementById("friendForm").submit();
+        } else{
+            e.preventDefault();
         }               
     }) 
-    denyBtn.addEventListener('click', function(){
+    denyBtn.addEventListener('click', function(e){
         if (confirm("The selected friend requests will be denied!") === true) {
             document.getElementById("friendForm").submit();
-        }               
+        } else{
+            e.preventDefault();
+        }
     })     
 </script>
