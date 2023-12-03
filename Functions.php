@@ -441,6 +441,16 @@ function sendFriendRequest($userId, $friendId, $friendName, $status) {
     return $successMsg;
 }
 
+function deleteFriend($friendId, $userId){
+    $pdo=getPDO();
+        $sql = "DELETE FROM Friendship "
+                        . "WHERE ((Friend_RequesterId = :userId AND Friend_RequesteeId= :friendId) "
+                        . "  OR (Friend_RequesterId = :friendId AND Friend_RequesteeId= :userId)) "
+                        . "    AND Status='accepted'";
+    $stmt=$pdo->prepare($sql);
+    $stmt->execute(['friendId' => $friendId, 'userId' => $userId]);  
+}
+
 function getFriendRequestersToAUser($userId) {
     $friendShipsRequested = array();
 
@@ -477,7 +487,10 @@ function getFriendList($userId) {
     $pdo = getPDO();
     $sql = "SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
         inner join User on Friend_RequesterId = User.UserId
-        WHERE Friend_RequesteeId = :userId AND Status = 'accepted'";
+        WHERE (Friend_RequesteeId = :userId) AND Status = 'accepted' UNION
+        SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
+        inner join User on Friend_RequesteeId = User.UserId
+        WHERE (Friend_RequesterId = :userId) AND Status = 'accepted'";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['userId' => $userId]);
     foreach ($stmt as $row) {

@@ -16,6 +16,11 @@ $friends = getFriendList($user->getUserId());
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
+    if(isset($_POST["redirectBtn"])){
+        $_SESSION["friendId"] = $redirectedfriendId;  
+        header("Location: FriendPictures.php");
+        exit();         
+    }
     if (isset($_POST["acceptBtn"])) {
         $selectedRequesterIdList = $_POST['selectedRequesterIdList'];
         foreach ($selectedRequesterIdList as $requesterId) {
@@ -23,8 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $friends = getFriendList($user->getUserId());
             $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
         }
-    }
-    
+    }  
     if (isset($_POST["denyBtn"])) {
         $selectedRequesterIdList = $_POST['selectedRequesterIdList'];
         foreach ($selectedRequesterIdList as $requesterId) {
@@ -32,6 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
         }
     }
+    if(isset($_POST["defriendBtn"])){
+            $selectedDefriendList=$_POST["selectedFriendList"];
+            foreach ($selectedDefriendList as $defriendID){
+                deleteFriend($defriendID,$user->getUserId());
+            }
+    }    
 }
 
 
@@ -51,7 +61,7 @@ include("./common/header.php");
             <span class="pull-right"><a href="AddFriend.php">Add Friends</a></span>
         </div>
     </div>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+    <form id="friendForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
         <table class="table">
             <thead>
                 <tr>
@@ -69,17 +79,19 @@ include("./common/header.php");
                         $friendId = $fd->getRequesterId();
                         $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
                         echo '<tr>';
-                        echo "<td>$friendName</td>";
+                        echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
                         echo "<td>$albumNum</td>";
                         echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
-                        echo'</tr>';
+                        echo '</tr>';
                     }
                 }
                 ?>
-
+                <input type="hidden" name="redirectedfriendId" id="redirectedfriendId">
             </tbody>        
         </table>
-        <button type="submit" name="defriendBtn" class="btn btn-primary">Defriend Selected</button> 
+
+        <button type="submit" name="redirectBtn" id="redirectBtn" hidden>Redirect to Pictures</button> 
+        <button type="submit" name="defriendBtn" id="defriendBtn" class="btn btn-primary">Defriend Selected</button> 
         <br>
         <br>
         <br>
@@ -119,3 +131,21 @@ include("./common/header.php");
     <br>
 </div>
 <?php include('./common/footer.php'); ?>
+
+<script type="text/javascript">
+    const redirectedfriendId = document.getElementById("redirectedfriendId"); 
+    const redirectBtn = document.getElementById("redirectBtn"); 
+    const defriendBtn = document.getElementById("defriendBtn"); 
+    function redirectPictures(friendId) {
+        console.log(friendId);
+        redirectedfriendId.value = friendId;
+        redirectBtn.click();
+        return false;
+    }   
+    
+    defriendBtn.addEventListener('click', function(){
+        if (confirm("Are you sure to delete the selected friends?") === true) {
+            document.getElementById("friendForm").submit();
+        }               
+    })    
+</script>
