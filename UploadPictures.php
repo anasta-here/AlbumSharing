@@ -27,7 +27,6 @@ define("THUMB_MAX_HEIGHT", 100);
 $supportedImageTypes = array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
     if (isset($_POST["uploadBtn"])) {
         $destination = './originals';
 

@@ -60,10 +60,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 }else{
-    $_SESSION["albumId"] = '';
-    unset($_SESSION['fileName']);
-    unset($_SESSION["selectedPicture"]);
-    unset($_SESSION["comments"]);
+	$_SESSION["albumId"] = '';
+	unset($_SESSION['fileName']);
+	unset($_SESSION["selectedPicture"]);
+	unset($_SESSION["comments"]);
 }
 
 include("./common/header.php");

@@ -72,17 +72,20 @@ include("./common/header.php");
             </thead>    
             <tbody>
                 <?php
-                global $friends;
+                //global $friends;
                 if (!empty($friends)) {
                     foreach ($friends as $fd) {
-                        $friendName = $fd->getRequesterName();
-                        $friendId = $fd->getRequesterId();
-                        $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
-                        echo '<tr>';
-                        echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
-                        echo "<td>$albumNum</td>";
-                        echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
-                        echo '</tr>';
+                        //to avoid friend duplication in two-way friend requests
+                        if ($fd->getRequesterId() != $user->getUserId()){
+                            $friendName = $fd->getRequesterName();
+                            $friendId = $fd->getRequesterId();
+                            $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
+                            echo '<tr>';
+                            echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
+                            echo "<td>$albumNum</td>";
+                            echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
+                            echo '</tr>';                            
+                        }
                     }
                 }
                 ?>
@@ -126,7 +129,7 @@ include("./common/header.php");
             </tbody>        
         </table>     
         <button type="submit" name="acceptBtn" class="btn btn-primary">Accept Selected</button> 
-        <button type="submit" name="denyBtn" class="btn btn-primary">Deny Selected</button> 
+        <button type="submit" name="denyBtn" id="denyBtn" class="btn btn-primary">Deny Selected</button> 
     </form>
     <br>
 </div>
@@ -136,6 +139,7 @@ include("./common/header.php");
     const redirectedfriendId = document.getElementById("redirectedfriendId"); 
     const redirectBtn = document.getElementById("redirectBtn"); 
     const defriendBtn = document.getElementById("defriendBtn"); 
+    const denyBtn = document.getElementById("denyBtn"); 
     function redirectPictures(friendId) {
         console.log(friendId);
         redirectedfriendId.value = friendId;
@@ -144,8 +148,13 @@ include("./common/header.php");
     }   
     
     defriendBtn.addEventListener('click', function(){
-        if (confirm("Are you sure to delete the selected friends?") === true) {
+        if (confirm("The selected friends will be defriended!") === true) {
             document.getElementById("friendForm").submit();
         }               
-    })    
+    }) 
+    denyBtn.addEventListener('click', function(){
+        if (confirm("The selected friend requests will be denied!") === true) {
+            document.getElementById("friendForm").submit();
+        }               
+    })     
 </script>
