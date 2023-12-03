@@ -176,11 +176,13 @@ class Friendship {
 
     private $requesterId;
     private $requesteeId;
+    private $requesterName;
     private $status;
 
-    public function __construct($requesterId, $requesteeId, $status) {
+    public function __construct($requesterId, $requesteeId, $requesterName, $status) {
         $this->requesterId = $requesterId;
         $this->requesteeId = $requesteeId;
+        $this->requesterName = $requesterName;
         $this->status = $status;
     }
 
@@ -190,6 +192,10 @@ class Friendship {
 
     public function getRequesteeId() {
         return $this->requesteeId;
+    }
+    
+    public function getRequesterName() {
+        return $this->requesterName;
     }
 
     public function getStatus() {

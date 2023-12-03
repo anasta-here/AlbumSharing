@@ -226,19 +226,19 @@ function getPictureNumByAlbumId($ablumId) {
 function deleteAlbum($albumId) {
     $pictures = getAllPicturessByAlbumId($albumId);
     $pdo = getPDO();
-    
-    foreach($pictures as $picture){
+
+    foreach ($pictures as $picture) {
         $pictureId = $picture->getPictureId();
-        
+
         $sql1 = "DELETE FROM Comment WHERE Picture_Id = :pictureId";
         $stmt1 = $pdo->prepare($sql1);
         $stmt1->execute(['pictureId' => $pictureId]);
-        
+
         $sql2 = "DELETE FROM Picture WHERE Picture_Id = :pictureId";
         $stmt2 = $pdo->prepare($sql2);
-        $stmt2->execute(['pictureId' => $pictureId]);        
+        $stmt2->execute(['pictureId' => $pictureId]);
     }
-    
+
     $sql3 = "DELETE FROM Album WHERE Album_Id = :albumId;";
     $stmt3 = $pdo->prepare($sql3);
     $stmt3->execute(['albumId' => $albumId]);
@@ -358,7 +358,6 @@ function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight) {
     }
 }
 
-
 //Add Friends
 
 function getFriendshipStatus() {
@@ -393,30 +392,109 @@ function getFriend($friendId) {
     }
 }
 
-function ValidateFriendId($userId, $friendId){  
-    if ($userId == $friendId){
-        $friendIdErr = "You cannot send a friend request to yourself!";
-    } else {
-        $pdo = getPDO();
-        $sql = "SELECT * FROM User WHERE UserId = :friendId";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['friendId' => $friendId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+function ValidateFriendId($userId, $friendId) {
+    $pdo = getPDO();
+    $sql1 = "SELECT * FROM User WHERE UserId = :friendId";
+    $stmt1 = $pdo->prepare($sql1);
+    $stmt1->execute(['friendId' => $friendId]);
+    $row1 = $stmt1->fetch(PDO::FETCH_ASSOC);    
 
-        if ($row) {
-            $friendIdErr = "";
-        } else {
-            $friendIdErr = "The user ID doesn't exist!";
-        }        
-    }
+    $sql2 = "SELECT * FROM Friendship 
+            WHERE (Friend_RequesterId = :userId AND Friend_RequesteeId = :friendId)
+               OR (Friend_RequesterId = :friendId AND Friend_RequesteeId = :userId)
+               AND Status = 'accepted'";  
+    $stmt2 = $pdo->prepare($sql2);
+    $stmt2->execute(['userId' => $userId, 'friendId' => $friendId]);
+    $row2 = $stmt2->fetch(PDO::FETCH_ASSOC);    
     
-    return $friendIdErr;   
+    if ($userId == $friendId) {
+        $friendIdErr = "You cannot send a friend request to yourself!";
+    } elseif(!$row1){
+        $friendIdErr = "The user ID doesn't exist!";
+    } elseif($row2){
+        $friendIdErr = "You are already friends!";
+    } else {
+        $friendIdErr = "";
+    }
+    return $friendIdErr;
 }
 
-function sendFriendRequest($userId, $friendId, $status) {
+function sendFriendRequest($userId, $friendId, $friendName, $status) {
     $pdo = getPDO();
-
     $sql = "INSERT INTO Friendship (Friend_RequesterId, Friend_RequesteeId, Status) VALUES( :userId, :friendId, :status)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['Friend_RequesterId' => $userId, 'Friend_RequesteeId' => $friendId, 'Status' => $status]);
+    $stmt->execute(['userId' => $userId, 'friendId' => $friendId, 'status' => $status]);     
+
+    $sql1 = "SELECT * FROM Friendship 
+            WHERE Friend_RequesterId = :friendId AND Friend_RequesteeId = :userId AND Status = 'request'";  
+    $stmt1 = $pdo->prepare($sql1);
+    $stmt1->execute(['userId' => $userId, 'friendId' => $friendId]);
+    $row1 = $stmt1->fetch(PDO::FETCH_ASSOC); 
+    
+    if($row1){
+        acceptFriendRequest($friendId, $userId);
+        acceptFriendRequest($userId, $friendId);
+        $successMsg = "You are friends now!";
+    } else {
+        $successMsg = "Your request has been sent to $friendName (ID: $friendId). Once $friendName accepts your request, you and $friendName will be friends and be able to view each other's albums.";
+    }
+    return $successMsg;
+}
+
+function getFriendRequestersToAUser($userId) {
+    $friendShipsRequested = array();
+
+    $pdo = getPDO();
+    $sql = "SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
+        inner join User on Friend_RequesterId = User.UserId
+        WHERE Friend_RequesteeId = :userId AND Status = 'request'";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['userId' => $userId]);
+    foreach ($stmt as $row) {
+        $friendShipRequested = new Friendship($row['Friend_RequesterId'], $row['Friend_RequesteeId'], $row['Name'], $row['Status']);
+        $friendShipsRequested[] = $friendShipRequested;
+    }
+    return $friendShipsRequested;
+}
+
+function acceptFriendRequest($requesterId, $userId) {
+    $pdo = getPDO();
+    $sql = "UPDATE Friendship SET Status = 'accepted' WHERE Friend_RequesterId = :requesterId AND Friend_RequesteeId = :userId";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['requesterId' => $requesterId, 'userId' => $userId]);
+}
+
+function denyFriendRequest($requesterId, $userId) {
+    $pdo = getPDO();
+    $sql = "DELETE FROM Friendship WHERE Friend_RequesterId = :requesterId AND Friend_RequesteeId = :userId AND Status='request'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['requesterId' => $requesterId, 'userId' => $userId]);
+}
+
+function getFriendList($userId) {
+    $friends = array();
+    $pdo = getPDO();
+    $sql = "SELECT Friend_RequesterId, Friend_RequesteeId, User.Name, Status FROM Friendship as fs
+        inner join User on Friend_RequesterId = User.UserId
+        WHERE Friend_RequesteeId = :userId AND Status = 'accepted'";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['userId' => $userId]);
+    foreach ($stmt as $row) {
+        $friend = new Friendship($row['Friend_RequesterId'], $row['Friend_RequesteeId'], $row['Name'], $row['Status']);
+        $friends[] = $friend;
+    }
+    return $friends;
+}
+
+function getNumbersOfSharedAlbumsOfFriends ($friendId) {
+    $pdo = getPDO();
+    $sql = "SELECT COUNT(*) FROM Album WHERE Owner_Id = :friendId AND Accessibility_Code= 'shared'";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['friendId' => $friendId]);
+
+    $albumNum = $stmt->fetchColumn();
+
+    return $albumNum;
 }

@@ -23,9 +23,7 @@
                 try {
                     $friend = getFriend($friendId);
                     $friendName = getFriend($friendId)->getFriendName();                    
-                    sendFriendRequest($user->getUserId(), $friendId, $status);            
-                    $successMsg = "Your request has been sent to $friendName (ID: $friendId). Once $friendName accepts your request, you and $friendName will be friends and be able to view each other's albums.";
-
+                    $successMsg = sendFriendRequest($user->getUserId(), $friendId, $friendName, $status);                  
                 }
                 catch (Exception $e)
                 {
