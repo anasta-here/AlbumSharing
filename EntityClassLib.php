@@ -151,3 +151,67 @@ class Comment {
         return $this->name;
     }
 }
+
+class Friend {
+
+    private $friendId;
+    private $friendName;
+
+    public function __construct($friendId, $friendName) {
+        $this->friendId = $friendId;
+        $this->friendName = $friendName;
+    }
+
+    public function getFriendId() {
+        return $this->friendId;
+    }
+
+    public function getFriendName() {
+        return $this->friendName;
+    }
+
+}
+
+class Friendship {
+
+    private $requesterId;
+    private $requesteeId;
+    private $status;
+
+    public function __construct($requesterId, $requesteeId, $status) {
+        $this->requesterId = $requesterId;
+        $this->requesteeId = $requesteeId;
+        $this->status = $status;
+    }
+
+    public function getRequesterId() {
+        return $this->requesterId;
+    }
+
+    public function getRequesteeId() {
+        return $this->requesteeId;
+    }
+
+    public function getStatus() {
+        return $this->status;
+    }    
+}
+
+class FriendshipStatus {
+
+    private $code;
+    private $description;
+
+    public function __construct($code, $description) {
+        $this->code = $code;
+        $this->description = $description;
+    }
+
+    public function getCode() {
+        return $this->code;
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+}
