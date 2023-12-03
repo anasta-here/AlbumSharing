@@ -244,13 +244,20 @@ function deleteAlbum($albumId) {
     $stmt3->execute(['albumId' => $albumId]);
 }
 
-function getAllPicturessByAlbumId($ablumId) {
+function addPicture($albumId, $fileName, $title, $description) {
+    $pdo = getPDO();
+    $sql = "INSERT INTO Picture (Album_Id, File_Name, Title, Description) VALUES( :Album_Id, :File_Name, :Title, :Description)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['Album_Id' => $albumId, 'File_Name' => $fileName, 'Title' => $title, 'Description' => $description]);
+}
+
+function getAllPicturessByAlbumId($albumId) {
     $pictures = array();
     $pdo = getPDO();
     $sql = "SELECT * FROM Picture WHERE Album_Id = :albumId";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->execute(['albumId' => $ablumId]);
+    $stmt->execute(['albumId' => $albumId]);
 
     foreach ($stmt as $row) {
         $picture = new Picture($row['Picture_Id'], $row['Album_Id'], $row['File_Name'], $row['Title'], $row['Description']);
@@ -349,4 +356,67 @@ function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight) {
     } else {
         return $newFilePath;
     }
+}
+
+
+//Add Friends
+
+function getFriendshipStatus() {
+    $friendshipStatus = array();
+
+    $pdo = getPDO();
+
+    $sql = "SELECT * FROM FriendshipStatus";
+
+    $resultSet = $pdo->query($sql);
+
+    foreach ($resultSet as $row) {
+        $fs = new FriendshipStatus($row['Status_Code'], $row['Description']);
+        $friendshipStatus[] = $fs;
+    }
+
+    return $friendshipStatus;
+}
+
+function getFriend($friendId) {
+    $pdo = getPDO();
+
+    $sql = "SELECT UserId, Name FROM User WHERE UserId = :friendId";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['friendId' => $friendId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        return new Friend($row['UserId'], $row['Name']);
+    } else {
+        return null;
+    }
+}
+
+function ValidateFriendId($userId, $friendId){  
+    if ($userId == $friendId){
+        $friendIdErr = "You cannot send a friend request to yourself!";
+    } else {
+        $pdo = getPDO();
+        $sql = "SELECT * FROM User WHERE UserId = :friendId";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['friendId' => $friendId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($row) {
+            $friendIdErr = "";
+        } else {
+            $friendIdErr = "The user ID doesn't exist!";
+        }        
+    }
+    
+    return $friendIdErr;   
+}
+
+function sendFriendRequest($userId, $friendId, $status) {
+    $pdo = getPDO();
+
+    $sql = "INSERT INTO Friendship (Friend_RequesterId, Friend_RequesteeId, Status) VALUES( :userId, :friendId, :status)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['Friend_RequesterId' => $userId, 'Friend_RequesteeId' => $friendId, 'Status' => $status]);
 }
