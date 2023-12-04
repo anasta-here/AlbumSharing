@@ -11,10 +11,6 @@ if (isset($_SESSION["user"])) {
     exit();
 }
 
-unset($_SESSION['fileName']);
-unset($_SESSION["selectedPicture"]);
-unset($_SESSION["comments"]);
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
 
@@ -23,6 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $pictures = getAllPicturessByAlbumId($albumId);
             if (empty($pictures)) {
                 $noPictures = true;
+                $noPictureMsg = "<p>No pictures found in the album.</p>";
             } else {
                 $noPictures = false;
             }
@@ -59,11 +56,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
-}else{
-	$_SESSION["albumId"] = '';
-	unset($_SESSION['fileName']);
-	unset($_SESSION["selectedPicture"]);
-	unset($_SESSION["comments"]);
 }
 
 include("./common/header.php");
@@ -91,7 +83,7 @@ include("./common/header.php");
         <div class="row form-group">
             <div class="col-md-7">
                 <?php
-                if (isset($_SESSION['fileName']) && isset($_SESSION["selectedPicture"])) {
+                if (isset($_SESSION['fileName'])) {
                     $selectedPicture = $_SESSION["selectedPicture"];
                     $selectedPictureTitle = $selectedPicture->getTitle();
                     echo "<h4 class=\"text-center\">$selectedPictureTitle</h4>";
@@ -108,7 +100,10 @@ include("./common/header.php");
                             echo "<h4 class=\"text-center\">$firstPictureTitle</h4>";
                             echo '<img class="img-responsive" src="' . $imagesPath . '">';
                         } else {
-                            echo "<p>No pictures found in the album.</p>";
+                            global $noPictureMsg;
+                            if ($noPictureMsg) {
+                                echo $noPictureMsg;
+                            }
                         }
                     }
                 }
@@ -140,8 +135,10 @@ include("./common/header.php");
                 <input type="text" name="selectedImageFileName" id="imageFileName" hidden/>
             </div>
 
-            <?php global $noPictures;
-            if (!$noPictures) : ?>
+            <?php
+            global $noPictures;
+            if (!$noPictures) :
+                ?>
                 <div class="col-md-5">
                     <?php
                     if (isset($_SESSION["selectedPicture"])) {
@@ -188,11 +185,11 @@ include("./common/header.php");
                         }
                     }
                     ?>
-                    <?php endif; ?>
-                    <button type="submit" name="albumChangeBtn" id="albumSelectionChange" hidden></button>
-                    <button type="submit" name="thumbnailChangeBtn" id="thumbnailChange" hidden></button>
-                </div>
-            
+<?php endif; ?>
+                <button type="submit" name="albumChangeBtn" id="albumSelectionChange" hidden></button>
+                <button type="submit" name="thumbnailChangeBtn" id="thumbnailChange" hidden></button>
+            </div>
+
         </div>
     </form>
 </div>

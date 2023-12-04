@@ -11,10 +11,16 @@ if (isset($_SESSION["friendId"])) {
     exit();
 }
 
+if (isset($_SESSION["user"])) {
+    $user = $_SESSION["user"];
+} else {
+    header("Location: Login.php");
+    exit();
+}
+
 unset($_SESSION['fileName']);
 unset($_SESSION["selectedPicture"]);
 unset($_SESSION["comments"]);
-unset($_SESSION["albumId"]);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
@@ -50,13 +56,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['commentBtn'])) {
         if (isset($_SESSION["selectedPicture"])) {
             $selectedPicture = $_SESSION["selectedPicture"];
-            addCommentOnMyPicturePage($friendId, $selectedPicture->getPictureId(), $_POST['commentText']);
+            addCommentOnMyPicturePage($user->getUserId(), $selectedPicture->getPictureId(), $_POST['commentText']);
             $comments = getAllCommentsForSelectedPictureOnMyPicturePage($selectedPicture->getPictureId());
             $_SESSION['comments'] = $comments;
         } else {
             if (isset($_SESSION['albumId'])) {
                 $pictures = getAllPicturessByAlbumId($_SESSION["albumId"]);
-                addCommentOnMyPicturePage($friendId, $pictures[0]->getPictureId(), $_POST['commentText']);
+                addCommentOnMyPicturePage($user->getUserId(), $pictures[0]->getPictureId(), $_POST['commentText']);
             }
         }
     }

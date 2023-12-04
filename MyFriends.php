@@ -80,7 +80,11 @@ include("./common/header.php");
                         $friendId = $fd->getRequesterId();
                         $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
                         echo '<tr>';
-                        echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
+                        if ($albumNum > 0){
+                            echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
+                        }else{
+                            echo "<td>$friendName</td>";
+                        }                     
                         echo "<td>$albumNum</td>";
                         echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
                         echo '</tr>';                            
