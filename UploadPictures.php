@@ -10,6 +10,11 @@ if (isset($_SESSION["user"])) {
     exit();
 }
 
+unset($_SESSION['fileName']);
+unset($_SESSION["selectedPicture"]);
+unset($_SESSION["comments"]);
+unset($_SESSION["albumId"]);
+
 $Msg = "";
 
 //define constants for convenience

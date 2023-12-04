@@ -10,16 +10,20 @@ if (isset($_SESSION["user"])) {
     exit();
 }
 
+unset($_SESSION['fileName']);
+unset($_SESSION["selectedPicture"]);
+unset($_SESSION["comments"]);
+unset($_SESSION["albumId"]);
+
 $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
 $friends = getFriendList($user->getUserId());
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
-    if(isset($_POST["redirectBtn"])){
-        $_SESSION["friendId"] = $redirectedfriendId;  
+    if (isset($_POST["redirectBtn"])) {
+        $_SESSION["friendId"] = $redirectedfriendId;
         header("Location: FriendPictures.php");
-        exit();         
+        exit();
     }
     if (isset($_POST["acceptBtn"])) {
         $selectedRequesterIdList = $_POST['selectedRequesterIdList'];
@@ -29,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $friends = getFriendList($user->getUserId());
             $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
         }
-    }  
+    }
     if (isset($_POST["denyBtn"])) {
         $selectedRequesterIdList = $_POST['selectedRequesterIdList'];
         foreach ($selectedRequesterIdList as $requesterId) {
@@ -37,12 +41,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $friendShipsRequested = getFriendRequestersToAUser($user->getUserId());
         }
     }
-    if(isset($_POST["defriendBtn"])){
-            $selectedDefriendList=$_POST["selectedFriendList"];
-            foreach ($selectedDefriendList as $defriendID){
-                deleteFriend($defriendID,$user->getUserId());
-            }
-    }    
+    if (isset($_POST["defriendBtn"])) {
+        $selectedDefriendList = $_POST["selectedFriendList"];
+        foreach ($selectedDefriendList as $defriendID) {
+            deleteFriend($defriendID, $user->getUserId());
+        }
+    }
 }
 
 
@@ -80,18 +84,18 @@ include("./common/header.php");
                         $friendId = $fd->getRequesterId();
                         $albumNum = getNumbersOfSharedAlbumsOfFriends($friendId);
                         echo '<tr>';
-                        if ($albumNum > 0){
+                        if ($albumNum > 0) {
                             echo "<td><a href=\"javascript:void(0);\" onclick=\"redirectPictures('$friendId')\">$friendName</a></td>";
-                        }else{
+                        } else {
                             echo "<td>$friendName</td>";
-                        }                     
+                        }
                         echo "<td>$albumNum</td>";
                         echo "<td><input type='checkbox' name='selectedFriendList[]' value=$friendId></td>";
-                        echo '</tr>';                            
+                        echo '</tr>';
                     }
                 }
                 ?>
-                <input type="hidden" name="redirectedfriendId" id="redirectedfriendId">
+            <input type="hidden" name="redirectedfriendId" id="redirectedfriendId">
             </tbody>        
         </table>
 
@@ -138,29 +142,29 @@ include("./common/header.php");
 <?php include('./common/footer.php'); ?>
 
 <script type="text/javascript">
-    const redirectedfriendId = document.getElementById("redirectedfriendId"); 
-    const redirectBtn = document.getElementById("redirectBtn"); 
-    const defriendBtn = document.getElementById("defriendBtn"); 
-    const denyBtn = document.getElementById("denyBtn"); 
+    const redirectedfriendId = document.getElementById("redirectedfriendId");
+    const redirectBtn = document.getElementById("redirectBtn");
+    const defriendBtn = document.getElementById("defriendBtn");
+    const denyBtn = document.getElementById("denyBtn");
     function redirectPictures(friendId) {
         console.log(friendId);
         redirectedfriendId.value = friendId;
         redirectBtn.click();
         return false;
-    }   
-    
-    defriendBtn.addEventListener('click', function(e){
+    }
+
+    defriendBtn.addEventListener('click', function (e) {
         if (confirm("The selected friends will be defriended!") === true) {
             document.getElementById("friendForm").submit();
-        } else{
-            e.preventDefault();
-        }               
-    }) 
-    denyBtn.addEventListener('click', function(e){
-        if (confirm("The selected friend requests will be denied!") === true) {
-            document.getElementById("friendForm").submit();
-        } else{
+        } else {
             e.preventDefault();
         }
-    })     
+    })
+    denyBtn.addEventListener('click', function (e) {
+        if (confirm("The selected friend requests will be denied!") === true) {
+            document.getElementById("friendForm").submit();
+        } else {
+            e.preventDefault();
+        }
+    })
 </script>

@@ -10,6 +10,11 @@
         exit();           
     }
     
+    unset($_SESSION['fileName']);
+    unset($_SESSION["selectedPicture"]);
+    unset($_SESSION["comments"]);
+    unset($_SESSION["albumId"]);
+    
     
     $accessibilities = getAccessibilities();
     $albums = getAlbums($user->getUserId());
