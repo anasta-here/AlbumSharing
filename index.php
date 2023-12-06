@@ -4,6 +4,11 @@
     if(isset($_SESSION["user"])){
         $user = $_SESSION["user"];
     }
+    
+    unset($_SESSION['fileName']);
+    unset($_SESSION["selectedPicture"]);
+    unset($_SESSION["comments"]);
+    unset($_SESSION["albumId"]);
    
     include("./common/header.php"); 
 ?>

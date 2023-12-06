@@ -69,7 +69,7 @@ include("./common/header.php");
             <div class="col-md-7">
                 <select class="form-control" name="albumId" onchange="AlbumSelected()">
                     <?php
-                    $albums = getAlbums($user->getUserId());
+                    $albums = getMyOwnAlbums($user->getUserId());
                     $selectedAlbumId = isset($_SESSION['albumId']) ? $_SESSION['albumId'] : -1;
                     echo '<option value="-1" ' . ($selectedAlbumId == -1 ? 'selected' : '') . '>Select any album...</option>';
                     for ($i = 0; $i < count($albums); $i++) {

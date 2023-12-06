@@ -17,7 +17,7 @@
     
     
     $accessibilities = getAccessibilities();
-    $albums = getAlbums($user->getUserId());
+    $albums = getMyOwnAlbums($user->getUserId());
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $singleAlbumId = $_POST["singleAlbumId"]; 
@@ -33,14 +33,14 @@
         //delete the album with the corresponding Id and update all albums
         if(isset($_POST["deleteBtn"])){    
             deleteAlbum($singleAlbumId);
-            $albums = getAlbums($user->getUserId());            
+            $albums = getMyOwnAlbums($user->getUserId());            
         }
         //save accessibility change to the albums
         if(isset($_POST["saveBtn"])){ 
             for ($i = 0; $i < count($albums); $i++) {
                 updateAlbum($accessibilityCodes[$i], $albumIds[$i]); 
             }                      
-            $albums = getAlbums($user->getUserId());                           
+            $albums = getMyOwnAlbums($user->getUserId());                           
        }
     }      
     

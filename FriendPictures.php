@@ -18,10 +18,6 @@ if (isset($_SESSION["user"])) {
     exit();
 }
 
-unset($_SESSION['fileName']);
-unset($_SESSION["selectedPicture"]);
-unset($_SESSION["comments"]);
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     extract($_POST);
 
@@ -79,7 +75,7 @@ include("./common/header.php");
             <div class="col-md-7">
                 <select class="form-control" name="albumId" onchange="AlbumSelected()">
                     <?php
-                    $albums = getAlbums($friendId);
+                    $albums = getFriendsAlbums($friendId);
                     $selectedAlbumId = isset($_SESSION['albumId']) ? $_SESSION['albumId'] : -1;
                     echo '<option value="-1" ' . ($selectedAlbumId == -1 ? 'selected' : '') . '>Select any album...</option>';
                     for ($i = 0; $i < count($albums); $i++) {

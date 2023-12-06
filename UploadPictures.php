@@ -101,7 +101,7 @@ include("./common/header.php");
                 <div class="col-md-4">
                     <select class="form-control col-6" name="albumId">
                     <?php
-                    $albums = getAlbums($user->getUserId());
+                    $albums = getMyOwnAlbums($user->getUserId());
 
                     for ($i = 0; $i < count($albums); $i++) {
                         echo '<option value="' . $albums[$i]->getAlbumId() . '">' . $albums[$i]->getTitle() . '</option>';

@@ -23,7 +23,7 @@
        }
        //validate the input fields and if passed, add the album to the database
        if(isset($_POST["submitBtn"])){ 
-           $titleErr = ValidateTitle($title);
+           $titleErr = ValidateUserId($title);
            if(empty($titleErr)){
                 try {
                     addAlbum($title, $user->getUserId(), $description, $accessibilityCode);

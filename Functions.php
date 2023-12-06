@@ -185,12 +185,30 @@ function addAlbum($title, $userId, $description, $aCode) {
 }
 
 // for MyAlbum.php
-function getAlbums($userId) {
+function getMyOwnAlbums($userId) {
     $albums = array();
 
     $pdo = getPDO();
 
-    $sql = "SELECT * FROM Album WHERE Owner_Id = :userId";
+    $sql = "SELECT * FROM Album WHERE Owner_Id = :userId ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['userId' => $userId]);
+
+    foreach ($stmt as $row) {
+        $album = new Album($row['Album_Id'], $row['Title'], $row['Description'], $row['Owner_Id'], $row['Accessibility_Code']);
+        $albums[] = $album;
+    }
+
+    return $albums;
+}
+
+function getFriendsAlbums($userId) {
+    $albums = array();
+
+    $pdo = getPDO();
+
+    $sql = "SELECT * FROM Album WHERE Owner_Id = :userId And Accessibility_Code ='shared'";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['userId' => $userId]);

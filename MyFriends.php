@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedDefriendList = $_POST["selectedFriendList"];
         foreach ($selectedDefriendList as $defriendID) {
             deleteFriend($defriendID, $user->getUserId());
+            $friends = getFriendList($user->getUserId());
         }
     }
 }
