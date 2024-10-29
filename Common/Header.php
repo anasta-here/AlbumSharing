@@ -1,12 +1,19 @@
 <!DOCTYPE html>
+<?php     
+    if(isset($_SESSION["user"])){
+        $user = $_SESSION["user"];
+    }
+?>
 <html lang="en" style="position: relative; min-height: 100%;">
 <head>
 	<title>Algonquin Social Media Website</title>
         <meta charset="utf-8"> 
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.6/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="Common/css/Site.css">
+        <link rel="stylesheet" href="Common/css/Css.css">
+
 </head>
+
 <body style="padding-top: 50px; margin-bottom: 60px;">
     <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
       <div class="container-fluid">
@@ -30,7 +37,7 @@
             <li><a href="MyAlbums.php">My Albums</a></li>
             <li><a href="MyPictures.php">My Pictures</a></li>
             <li><a href="UploadPictures.php">Upload Pictures</a></li>
-            <?php print ($user) ? '<li><a href="Logout.php">Log Out</a></li>' : '<li><a href="Login.php">Log In</a></li>';?>            
+            <?php global $user; print ($user) ? '<li><a href="Logout.php">Log Out</a></li>' : '<li><a href="Login.php">Log In</a></li>';?>            
           </ul>
         </div>
       </div>  

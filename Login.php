@@ -13,6 +13,7 @@
     $userIdErr = $passwordErr = $credentialErr = "";
     
     extract($_POST);    
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
     $hashedPassword = hash("sha256", $password);
     
     if(isset($clearBtn)){

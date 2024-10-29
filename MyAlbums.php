@@ -10,25 +10,37 @@
         exit();           
     }
     
+    unset($_SESSION['fileName']);
+    unset($_SESSION["selectedPicture"]);
+    unset($_SESSION["comments"]);
+    unset($_SESSION["albumId"]);
+    
+    
     $accessibilities = getAccessibilities();
-    $albums = getAlbums($user->getUserId());
+    $albums = getMyOwnAlbums($user->getUserId());
     
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $singleAlbumId = $_POST["singleAlbumId"]; 
         $albumIds = $_POST["albumIds"]; 
         $accessibilityCodes = $_POST["accessibility"];  
+      
+        //redirect the page to MyPictures.php with the selecte album
+        if(isset($_POST["redirectBtn"])){  
+            $_SESSION["albumId"] = $singleAlbumId;  
+            header("Location: MyPictures.php");
+            exit();     
+        }        
         //delete the album with the corresponding Id and update all albums
         if(isset($_POST["deleteBtn"])){    
-            foreach($albumIds as $albumId){
-                deleteAlbum($albumId);
-            }
-            $albums = getAlbums($user->getUserId());            
+            deleteAlbum($singleAlbumId);
+            $albums = getMyOwnAlbums($user->getUserId());            
         }
         //save accessibility change to the albums
         if(isset($_POST["saveBtn"])){ 
             for ($i = 0; $i < count($albums); $i++) {
                 updateAlbum($accessibilityCodes[$i], $albumIds[$i]); 
             }                      
-            $albums = getAlbums($user->getUserId());                           
+            $albums = getMyOwnAlbums($user->getUserId());                           
        }
     }      
     
@@ -55,20 +67,22 @@
           <?php
                 for ($i = 0; $i < count($albums); $i++) {
                     echo '<tr>';
-                    echo '<td><a href="MyPictures.php">'.$albums[$i]->getTitle().'</a></td>';
-                    echo '<td>'.'to be calculated'.'</td>';
+                    echo '<td><a href="javascript:void(0);" onclick="redirectAlbum('.$albums[$i]->getAlbumId().')">'.$albums[$i]->getTitle().'</a></td>';
+                    echo '<td>'.getPictureNumByAlbumId($albums[$i]->getAlbumId()).'</td>';
                     echo '<td><select class="form-control" name="accessibility[]" onchange="updateAlbum('.$i.','.$albums[$i]->getAlbumId().')">'; //pass index and albumId as two parameters to the function
                     foreach($accessibilities as $a){
                         echo '<option value="'.$a->getCode().'"'.($albums[$i]->getAccessibilityCode() == $a->getCode() ? 'selected': '').'>'.$a->getDescription().'</option>'; //display the preferred accessibility option stored in the database as selected
                     }                        
                     echo '</select></td>';                
                     echo '<td><input type="hidden" name="albumIds[]" class="selectedAlbumId"></td>';
-                    echo '<td><a href="javascript:void(0);" onclick="confirmDelete('.$i.','.$albums[$i]->getAlbumId().')">Delete</a></td>'; //pass index and albumId as two parameters to the function
+                    echo '<td><a href="javascript:void(0);" onclick="confirmDelete('.$albums[$i]->getAlbumId().')">Delete</a></td>'; //pass index and albumId as two parameters to the function
                     echo '</tr>';                      
                 }   
           ?>                      
         </tbody>
     </table>
+    <input type="hidden" name="singleAlbumId" id="singleAlbumId">
+    <button type="submit" name="redirectBtn" id="redirectBtn" hidden>Redirect Album</button>
     <button type="submit" name="deleteBtn" id="deleteBtn" hidden>Delete</button>
     <button type="submit" name="saveBtn" class="btn btn-primary">Save Changes</button> 
 </form>
@@ -78,7 +92,9 @@
 
 <script type="text/javascript">
     const selectedAlbumIds = document.querySelectorAll(".selectedAlbumId");
+    const singleAlbumId = document.getElementById("singleAlbumId"); 
     const deleteBtn = document.getElementById("deleteBtn"); 
+    const redirectBtn = document.getElementById("redirectBtn"); 
     function updateAlbum(index, albumId) {
         for (let i = 0; i < selectedAlbumIds.length; i++) {
             if (i === index){
@@ -86,14 +102,14 @@
             }     
         }
     }  
-    function confirmDelete(index, albumId) {
+    function redirectAlbum(albumId) {
+        singleAlbumId.value = albumId;
+        redirectBtn.click();
+        return false;
+    }   
+    function confirmDelete( albumId) {
         if (confirm("This album will be deleted!") === true) {
-            for (let i = 0; i < selectedAlbumIds.length; i++) {
-                if (i === index){
-                    selectedAlbumIds[i].value = albumId;
-                    break;
-                }     
-            }
+            singleAlbumId.value = albumId;
             deleteBtn.click();
         }
         return false;

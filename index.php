@@ -4,12 +4,20 @@
     if(isset($_SESSION["user"])){
         $user = $_SESSION["user"];
     }
+    
+    unset($_SESSION['fileName']);
+    unset($_SESSION["selectedPicture"]);
+    unset($_SESSION["comments"]);
+    unset($_SESSION["albumId"]);
    
     include("./common/header.php"); 
 ?>
 <div class="container">
 <br>
-<h1>Welcome to Algonquin Album Sharing Website</h1>
+<div style="display: flex; align-items: center;">
+    <h1 style="margin-right: 20px">Welcome to Bee Yourself</h1>
+    <img src="Common/img/logo.jpeg" alt="Bee Yourself logo" style="max-width:80px; max-height:100%;"/>
+</div>
 <br>
 <?php 
     if (!$user){
