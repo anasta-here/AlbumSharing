@@ -19,7 +19,7 @@
 </head>
 
 <body style="padding-top: 50px; margin-bottom: 60px;">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" style="background-color: #CDB4DB; border-radius: 0 0 20px 20px; border: none;">
       <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
