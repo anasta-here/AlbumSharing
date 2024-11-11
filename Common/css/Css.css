@@ -1,3 +1,7 @@
+* {
+    font-family: "Comfortaa", serif;
+}
+
 .thumbnail-bar {
     overflow-x: scroll;
     white-space: nowrap;

@@ -6,11 +6,14 @@
 ?>
 <html lang="en" style="position: relative; min-height: 100%;">
 <head>
-	<title>Algonquin Social Media Website</title>
+	<title>Bee Yourself</title>
         <meta charset="utf-8"> 
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.6/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="Common/css/Css.css">
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+        </style>
 
 </head>
 
@@ -26,8 +29,8 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" style="padding: 10px" href="http://www.algonquincollege.com">
-              <img src="Common/img/AC.png" 
-                   alt="Algonquin College" style="max-width:100%; max-height:100%;"/>
+              <img src="Common/img/BeeYourself_Logo.png" 
+                   alt="Bee Yourself Logo" style="max-width:100%; max-height:100%;"/>
           </a>    
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
