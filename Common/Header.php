@@ -18,9 +18,9 @@
 
 </head>
 
-<body style="padding-top: 50px; margin-bottom: 60px;">
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" style="background-color: #CDB4DB; border-radius: 0 0 20px 20px; border: none;">
-      <div class="container-fluid">
+<body>
+    <nav class="navbar navbar-default navbar-inverse" style="background-color: #CDB4DB; border-radius: 0 0 20px 20px; border: none;">
+      <div class="container-fluid" style="display: flex; align-items: center;">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -29,7 +29,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" style="padding: 10px" href="http://www.algonquincollege.com">
+          <a class="navbar-brand" style="padding: 10px; height: 80px;" href="http://www.algonquincollege.com">
               <img src="Common/img/BeeYourself_Logo.png" 
                    alt="Bee Yourself Logo" style="max-width:100%; max-height:100%;"/>
           </a>    
