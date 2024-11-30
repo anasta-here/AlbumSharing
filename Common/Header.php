@@ -29,14 +29,13 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" style="padding: 10px; height: 80px;" href="http://www.algonquincollege.com">
+          <a class="navbar-brand" style="padding: 10px; height: 80px;" href="Index.php">
               <img src="Common/img/BeeYourself_Logo.png" 
                    alt="Bee Yourself Logo" style="max-width:100%; max-height:100%;"/>
           </a>    
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="Index.php">Home</a></li>
             <li><a href="MyFriends.php">My Friends</a></li>
             <li><a href="MyAlbums.php">My Albums</a></li>
             <li><a href="MyPictures.php">My Pictures</a></li>
